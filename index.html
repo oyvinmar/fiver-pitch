@@ -17,7 +17,7 @@
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
-            padding: 5px;
+            padding: 5px 5px calc(20px + env(safe-area-inset-bottom)) 5px;
             touch-action: none;
             overflow-y: auto;
         }
@@ -499,26 +499,31 @@
             }
 
             .legend {
-                gap: 15px;
-                padding: 12px;
+                gap: 12px;
+                padding: 10px 12px;
+                margin-bottom: 10px;
             }
 
             .legend-item {
-                font-size: 14px;
+                font-size: 12px;
+            }
+
+            .legend-item span {
+                font-size: 12px;
             }
 
             .score {
-                font-size: 28px;
-                min-width: 25px;
+                font-size: 24px;
+                min-width: 22px;
             }
 
             .score-separator {
-                font-size: 20px;
+                font-size: 18px;
             }
 
             .legend-color {
-                width: 20px;
-                height: 20px;
+                width: 16px;
+                height: 16px;
             }
         }
     </style>
