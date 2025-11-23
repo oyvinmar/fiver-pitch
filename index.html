@@ -143,11 +143,19 @@
             animation: celebrate 0.4s ease-in-out 3;
         }
 
-        .stand.celebrating .spectators {
+        .stand.celebrating-blue .spectators {
             background-image:
-                radial-gradient(circle, rgba(255, 215, 0, 0.8) 1.5px, transparent 1.5px),
-                radial-gradient(circle, rgba(255, 140, 0, 0.7) 1.5px, transparent 1.5px),
-                radial-gradient(circle, rgba(255, 69, 0, 0.8) 1.5px, transparent 1.5px);
+                radial-gradient(circle, rgba(33, 150, 243, 0.9) 1.5px, transparent 1.5px),
+                radial-gradient(circle, rgba(66, 165, 245, 0.8) 1.5px, transparent 1.5px),
+                radial-gradient(circle, rgba(100, 181, 246, 0.9) 1.5px, transparent 1.5px);
+            animation: celebrate 0.4s ease-in-out 3;
+        }
+
+        .stand.celebrating-red .spectators {
+            background-image:
+                radial-gradient(circle, rgba(244, 67, 54, 0.9) 1.5px, transparent 1.5px),
+                radial-gradient(circle, rgba(229, 57, 53, 0.8) 1.5px, transparent 1.5px),
+                radial-gradient(circle, rgba(211, 47, 47, 0.9) 1.5px, transparent 1.5px);
             animation: celebrate 0.4s ease-in-out 3;
         }
 
@@ -694,8 +702,10 @@
         // Trigger celebration animation
         function celebrateGoal(scoringTeam) {
             const stands = document.querySelectorAll('.stand');
+            const celebrationClass = scoringTeam === 'kjelsas' ? 'celebrating-blue' : 'celebrating-red';
+
             stands.forEach(stand => {
-                stand.classList.add('celebrating');
+                stand.classList.add('celebrating', celebrationClass);
             });
 
             // Update score
@@ -710,7 +720,7 @@
             // Remove celebration class after animation
             setTimeout(() => {
                 stands.forEach(stand => {
-                    stand.classList.remove('celebrating');
+                    stand.classList.remove('celebrating', celebrationClass);
                 });
             }, 1200); // 3 iterations * 0.4s
         }
