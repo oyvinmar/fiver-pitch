@@ -1,0 +1,20 @@
+{
+  "name": "fiver-pitch",
+  "version": "1.0.0",
+  "description": "Interactive 5-a-side football pitch for tactical planning and play visualization",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve ."
+  },
+  "keywords": [
+    "football",
+    "soccer",
+    "5-a-side",
+    "tactical",
+    "pitch",
+    "visualization"
+  ],
+  "author": "Sander M. Rognerud & Øyvind Marthinsen",
+  "license": "MIT"
+}
