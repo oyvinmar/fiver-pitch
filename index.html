@@ -16,10 +16,11 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             padding: 10px;
             touch-action: none;
+            overflow-y: auto;
         }
 
         .container {
@@ -28,24 +29,35 @@
             background: white;
             border-radius: 12px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 20px;
+            padding: 0;
+            margin: auto;
         }
 
         h1 {
             text-align: center;
             color: #333;
-            margin-bottom: 20px;
+            margin: 15px 15px 10px 15px;
             font-size: 24px;
         }
 
         .field-container {
             position: relative;
             width: 100%;
-            padding-bottom: 150%; /* 2:3 aspect ratio for vertical field */
+            max-width: 450px;
+            max-height: calc(100vh - 240px);
+            aspect-ratio: 2 / 3;
+            margin: 0 auto;
             background: #4a9d5f;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        @supports not (aspect-ratio: 2 / 3) {
+            .field-container {
+                padding-bottom: 150%;
+                height: 0;
+            }
         }
 
         .field {
@@ -220,7 +232,7 @@
             display: flex;
             justify-content: center;
             gap: 30px;
-            margin-top: 20px;
+            margin: 20px 15px 15px 15px;
             padding: 15px;
             background: #f5f5f5;
             border-radius: 8px;
@@ -259,7 +271,7 @@
             display: flex;
             justify-content: center;
             gap: 15px;
-            margin-top: 15px;
+            margin: 15px 15px 0 15px;
         }
 
         .play-button {
