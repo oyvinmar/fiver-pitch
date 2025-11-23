@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Soccer Field - 5v5 Tactics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+            touch-action: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .field-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 150%; /* 2:3 aspect ratio for vertical field */
+            background: #4a9d5f;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .field {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, #4a9d5f 0%, #3d8850 100%);
+        }
+
+        /* Field markings */
+        .field-line {
+            position: absolute;
+            background: white;
+        }
+
+        /* Border lines */
+        .border-top { top: 2%; left: 5%; right: 5%; height: 2px; }
+        .border-bottom { bottom: 2%; left: 5%; right: 5%; height: 2px; }
+        .border-left { left: 5%; top: 2%; bottom: 2%; width: 2px; }
+        .border-right { right: 5%; top: 2%; bottom: 2%; width: 2px; }
+
+        /* Center line */
+        .center-line { top: 50%; left: 5%; right: 5%; height: 2px; }
+
+        /* Center circle */
+        .center-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20%;
+            aspect-ratio: 1;
+            border: 2px solid white;
+            border-radius: 50%;
+            background: transparent;
+        }
+
+        .center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        /* Penalty areas */
+        .penalty-area {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50%;
+            height: 15%;
+            border: 2px solid white;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .penalty-area.top { top: 2%; border-top: none; }
+        .penalty-area.bottom { bottom: 2%; border-bottom: none; }
+
+        /* Goal areas */
+        .goal-area {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30%;
+            height: 8%;
+            border: 2px solid white;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .goal-area.top { top: 2%; border-top: none; }
+        .goal-area.bottom { bottom: 2%; border-bottom: none; }
+
+        /* Goals */
+        .goal {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30%;
+            height: 3%;
+            background: rgba(255, 255, 255, 0.3);
+            border: 2px solid white;
+            z-index: 1;
+        }
+
+        .goal.top { top: 0%; border-top: none; }
+        .goal.bottom { bottom: 0%; border-bottom: none; }
+
+        /* Players */
+        .player {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            color: white;
+            cursor: move;
+            touch-action: none;
+            user-select: none;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            transition: transform 0.1s, box-shadow 0.1s;
+            transform: translate(-50%, -50%);
+        }
+
+        .player:active {
+            cursor: grabbing;
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            z-index: 100;
+        }
+
+        /* Kjelsas team - Blue and white */
+        .player.kjelsas {
+            background: linear-gradient(135deg, #1e5a9e 0%, #2a78d4 100%);
+            border-color: #ffffff;
+        }
+
+        /* Opposition team - Red */
+        .player.opposition {
+            background: linear-gradient(135deg, #c62828 0%, #e53935 100%);
+            border-color: #ffebee;
+        }
+
+        /* Goalkeepers - Yellow/Green */
+        .player.goalkeeper {
+            background: linear-gradient(135deg, #f9a825 0%, #fbc02d 100%) !important;
+            border-color: #fff9c4 !important;
+            font-weight: 900;
+            box-shadow: 0 2px 12px rgba(249, 168, 37, 0.5);
+        }
+
+        .player.goalkeeper:active {
+            box-shadow: 0 4px 16px rgba(249, 168, 37, 0.6);
+        }
+
+        /* Soccer Ball */
+        .ball {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #ffffff 0%, #e0e0e0 50%, #bdbdbd 100%);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4), inset -2px -2px 4px rgba(0, 0, 0, 0.2);
+            cursor: move;
+            touch-action: none;
+            user-select: none;
+            z-index: 15;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s, box-shadow 0.1s;
+            border: 2px solid #9e9e9e;
+        }
+
+        .ball:active {
+            cursor: grabbing;
+            transform: translate(-50%, -50%) scale(1.15);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .legend-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .legend-color.kjelsas {
+            background: linear-gradient(135deg, #1e5a9e 0%, #2a78d4 100%);
+        }
+
+        .legend-color.opposition {
+            background: linear-gradient(135deg, #c62828 0%, #e53935 100%);
+        }
+
+        .legend-color.goalkeeper {
+            background: linear-gradient(135deg, #f9a825 0%, #fbc02d 100%);
+            border-color: #fff9c4;
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .player {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+
+            .legend {
+                gap: 20px;
+                padding: 12px;
+            }
+
+            .legend-item {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚽ 5v5 Soccer Tactics</h1>
+
+        <div class="field-container">
+            <div class="field">
+                <!-- Field markings -->
+                <div class="field-line border-top"></div>
+                <div class="field-line border-bottom"></div>
+                <div class="field-line border-left"></div>
+                <div class="field-line border-right"></div>
+                <div class="field-line center-line"></div>
+
+                <div class="center-circle"></div>
+                <div class="center-dot"></div>
+
+                <!-- Penalty areas -->
+                <div class="penalty-area top"></div>
+                <div class="penalty-area bottom"></div>
+
+                <!-- Goal areas -->
+                <div class="goal-area top"></div>
+                <div class="goal-area bottom"></div>
+
+                <!-- Goals -->
+                <div class="goal top"></div>
+                <div class="goal bottom"></div>
+
+                <!-- Players will be added here by JavaScript -->
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color kjelsas"></div>
+                <span>Kjelsas</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color opposition"></div>
+                <span>Opposition</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color goalkeeper"></div>
+                <span>Goalkeepers</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Player positions (percentage of field dimensions)
+        // Kjelsas: 1-2-1 formation (bottom half)
+        const kjelasPlayers = [
+            { x: 50, y: 94, number: 1 },  // Goalkeeper
+            { x: 50, y: 78, number: 2 },  // Defender
+            { x: 35, y: 70, number: 3 },  // Left midfielder
+            { x: 65, y: 70, number: 4 },  // Right midfielder
+            { x: 50, y: 55, number: 5 }   // Forward
+        ];
+
+        // Opposition: 2-2 formation (top half)
+        const oppositionPlayers = [
+            { x: 50, y: 6, number: 1 },  // Goalkeeper
+            { x: 35, y: 22, number: 2 },  // Left defender
+            { x: 65, y: 22, number: 3 },  // Right defender
+            { x: 35, y: 35, number: 4 },  // Left forward
+            { x: 65, y: 35, number: 5 }   // Right forward
+        ];
+
+        const field = document.querySelector('.field');
+        let activePlayer = null;
+        let offset = { x: 0, y: 0 };
+
+        // Create players
+        function createPlayer(data, team) {
+            const player = document.createElement('div');
+            player.className = `player ${team}`;
+
+            // Mark goalkeepers (player number 1)
+            if (data.number === 1) {
+                player.classList.add('goalkeeper');
+            }
+
+            player.textContent = data.number;
+            player.style.left = `${data.x}%`;
+            player.style.top = `${data.y}%`;
+
+            // Mouse events for desktop
+            player.addEventListener('mousedown', startDrag);
+
+            // Touch events for mobile
+            player.addEventListener('touchstart', startDrag, { passive: false });
+
+            field.appendChild(player);
+            return player;
+        }
+
+        // Initialize players
+        kjelasPlayers.forEach(data => createPlayer(data, 'kjelsas'));
+        oppositionPlayers.forEach(data => createPlayer(data, 'opposition'));
+
+        // Create the ball
+        function createBall() {
+            const ball = document.createElement('div');
+            ball.className = 'ball';
+            ball.style.left = '50%';
+            ball.style.top = '50%';
+
+            // Mouse events for desktop
+            ball.addEventListener('mousedown', startDrag);
+
+            // Touch events for mobile
+            ball.addEventListener('touchstart', startDrag, { passive: false });
+
+            field.appendChild(ball);
+            return ball;
+        }
+
+        // Initialize ball at center spot
+        createBall();
+
+        function startDrag(e) {
+            e.preventDefault();
+            activePlayer = e.target;
+
+            const rect = field.getBoundingClientRect();
+            const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+            // Calculate offset from player center
+            const playerRect = activePlayer.getBoundingClientRect();
+            offset.x = clientX - (playerRect.left + playerRect.width / 2);
+            offset.y = clientY - (playerRect.top + playerRect.height / 2);
+
+            // Add event listeners
+            if (e.type.includes('touch')) {
+                document.addEventListener('touchmove', drag, { passive: false });
+                document.addEventListener('touchend', endDrag);
+            } else {
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('mouseup', endDrag);
+            }
+        }
+
+        function drag(e) {
+            if (!activePlayer) return;
+            e.preventDefault();
+
+            const rect = field.getBoundingClientRect();
+            const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+            // Calculate position relative to field
+            let x = clientX - rect.left - offset.x;
+            let y = clientY - rect.top - offset.y;
+
+            // Convert to percentage
+            let xPercent = (x / rect.width) * 100;
+            let yPercent = (y / rect.height) * 100;
+
+            // Constrain to field boundaries (with some padding)
+            xPercent = Math.max(5, Math.min(95, xPercent));
+            yPercent = Math.max(5, Math.min(95, yPercent));
+
+            activePlayer.style.left = `${xPercent}%`;
+            activePlayer.style.top = `${yPercent}%`;
+        }
+
+        function endDrag(e) {
+            if (e.type.includes('touch')) {
+                document.removeEventListener('touchmove', drag);
+                document.removeEventListener('touchend', endDrag);
+            } else {
+                document.removeEventListener('mousemove', drag);
+                document.removeEventListener('mouseup', endDrag);
+            }
+            activePlayer = null;
+        }
+
+        // Prevent default touch behavior on the field
+        field.addEventListener('touchstart', (e) => {
+            if (e.target.classList.contains('player') || e.target.classList.contains('ball')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        field.addEventListener('touchmove', (e) => {
+            if (activePlayer) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
+</body>
+</html>
