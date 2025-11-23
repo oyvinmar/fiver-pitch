@@ -297,7 +297,7 @@
         /* Animation transitions */
         .player.animating,
         .ball.animating {
-            transition: left 1s ease-in-out, top 1s ease-in-out;
+            transition: left 2s ease-in-out, top 2s ease-in-out;
         }
 
         @media (max-width: 480px) {
@@ -389,7 +389,7 @@
             { x: 50, y: 78, number: 2 },  // Defender
             { x: 35, y: 70, number: 3 },  // Left midfielder
             { x: 65, y: 70, number: 4 },  // Right midfielder
-            { x: 50, y: 55, number: 5 }   // Forward
+            { x: 50, y: 62, number: 5 }   // Forward
         ];
 
         // Opposition: 2-2 formation (top half)
@@ -483,58 +483,99 @@
             const defender = playerElements.find(p => p.dataset.team === 'kjelsas' && p.dataset.number === '2');
             const leftMid = playerElements.find(p => p.dataset.team === 'kjelsas' && p.dataset.number === '3');
             const rightMid = playerElements.find(p => p.dataset.team === 'kjelsas' && p.dataset.number === '4');
+            const forward = playerElements.find(p => p.dataset.team === 'kjelsas' && p.dataset.number === '5');
 
-            // Randomly choose left or right side for defender
-            const side = Math.random() > 0.5 ? 'left' : 'right';
-            const defenderX = side === 'left' ? 35 : 65;
-            const defenderY = 88;
+            // Reset all Kjelsas players to original positions
+            const kjelasPlayersToReset = [goalkeeper, defender, leftMid, rightMid, forward];
+            kjelasPlayersToReset.forEach(player => {
+                player.classList.add('animating');
+                const originalPos = originalPositions.get(player);
+                player.style.left = `${originalPos.x}%`;
+                player.style.top = `${originalPos.y}%`;
+            });
 
-            // Step 1: Move ball to goalkeeper (300ms)
+            // Reset ball to center
             ballElement.classList.add('animating');
-            ballElement.style.left = goalkeeper.style.left;
-            ballElement.style.top = goalkeeper.style.top;
+            ballElement.style.left = '50%';
+            ballElement.style.top = '50%';
 
+            // Wait for reset to complete before starting play sequence
             setTimeout(() => {
-                // Step 2: Defender drops back to receive (1000ms)
-                defender.classList.add('animating');
-                defender.style.left = `${defenderX}%`;
-                defender.style.top = `${defenderY}%`;
+                // Remove animating class after reset
+                kjelasPlayersToReset.forEach(player => player.classList.remove('animating'));
+                ballElement.classList.remove('animating');
+
+                // Randomly choose left or right side for defender
+                const side = Math.random() > 0.5 ? 'left' : 'right';
+                const defenderX = side === 'left' ? 35 : 65;
+                const defenderY = 88;
+
+                // Step 1: Move ball to goalkeeper (600ms)
+                ballElement.classList.add('animating');
+                ballElement.style.left = goalkeeper.style.left;
+                ballElement.style.top = goalkeeper.style.top;
 
                 setTimeout(() => {
-                    // Step 3: Ball moves to defender (1000ms)
-                    ballElement.style.left = defender.style.left;
-                    ballElement.style.top = defender.style.top;
-
-                    // Step 4: Midfielders move to support positions (1000ms)
-                    leftMid.classList.add('animating');
-                    rightMid.classList.add('animating');
-
-                    if (side === 'left') {
-                        // Defender is on left, midfielders approach
-                        leftMid.style.left = '25%';
-                        leftMid.style.top = '80%';
-                        rightMid.style.left = '50%';
-                        rightMid.style.top = '75%';
-                    } else {
-                        // Defender is on right, midfielders approach
-                        leftMid.style.left = '50%';
-                        leftMid.style.top = '75%';
-                        rightMid.style.left = '75%';
-                        rightMid.style.top = '80%';
-                    }
+                    // Step 2: Defender drops back to receive (2000ms)
+                    defender.classList.add('animating');
+                    defender.style.left = `${defenderX}%`;
+                    defender.style.top = `${defenderY}%`;
 
                     setTimeout(() => {
-                        // Animation complete - remove animating class
-                        ballElement.classList.remove('animating');
-                        defender.classList.remove('animating');
-                        leftMid.classList.remove('animating');
-                        rightMid.classList.remove('animating');
+                        // Step 3: Ball moves to defender (2000ms)
+                        ballElement.style.left = defender.style.left;
+                        ballElement.style.top = defender.style.top;
 
-                        playButton.disabled = false;
-                        isAnimating = false;
-                    }, 1000);
-                }, 1000);
-            }, 300);
+                        // Step 4: Midfielders and forward move to support positions (2000ms)
+                        leftMid.classList.add('animating');
+                        rightMid.classList.add('animating');
+                        forward.classList.add('animating');
+
+                        // Forward drops back to support
+                        forward.style.left = '50%';
+                        forward.style.top = '68%';
+
+                        let receivingMid;
+                        if (side === 'left') {
+                            // Defender is on left, midfielders approach
+                            leftMid.style.left = '25%';
+                            leftMid.style.top = '80%';
+                            rightMid.style.left = '50%';
+                            rightMid.style.top = '75%';
+                            receivingMid = leftMid; // Closer midfielder receives
+                        } else {
+                            // Defender is on right, midfielders approach
+                            leftMid.style.left = '50%';
+                            leftMid.style.top = '75%';
+                            rightMid.style.left = '75%';
+                            rightMid.style.top = '80%';
+                            receivingMid = rightMid; // Closer midfielder receives
+                        }
+
+                        setTimeout(() => {
+                            // Step 5: Defender passes to midfielder (2000ms)
+                            ballElement.style.left = receivingMid.style.left;
+                            ballElement.style.top = receivingMid.style.top;
+
+                            // Step 6: Forward makes a run to the same side as defender (2000ms)
+                            forward.style.left = side === 'left' ? '35%' : '65%';
+                            forward.style.top = '48%';
+
+                            setTimeout(() => {
+                                // Animation complete - remove animating class
+                                ballElement.classList.remove('animating');
+                                defender.classList.remove('animating');
+                                leftMid.classList.remove('animating');
+                                rightMid.classList.remove('animating');
+                                forward.classList.remove('animating');
+
+                                playButton.disabled = false;
+                                isAnimating = false;
+                            }, 2000);
+                        }, 2000);
+                    }, 2000);
+                }, 600);
+            }, 2000); // Wait for reset animation to complete
         }
 
         // Attach play button handler
