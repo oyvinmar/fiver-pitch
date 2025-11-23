@@ -328,27 +328,25 @@
 
         .legend {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
-            gap: 15px;
+            justify-content: center;
+            gap: 25px;
             margin: 20px 15px 15px 15px;
             padding: 15px;
             background: #f5f5f5;
             border-radius: 8px;
-        }
-
-        .legend-teams {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
+            flex-wrap: wrap;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 14px;
+            font-size: 16px;
+            font-weight: 600;
             color: #333;
+            flex: 0 0 auto;
         }
 
         .legend-color {
@@ -377,6 +375,7 @@
             justify-content: center;
             align-items: center;
             gap: 15px;
+            flex: 0 0 auto;
         }
 
         .score {
@@ -492,12 +491,26 @@
             }
 
             .legend {
-                gap: 20px;
+                gap: 15px;
                 padding: 12px;
             }
 
             .legend-item {
-                font-size: 13px;
+                font-size: 14px;
+            }
+
+            .score {
+                font-size: 28px;
+                min-width: 25px;
+            }
+
+            .score-separator {
+                font-size: 20px;
+            }
+
+            .legend-color {
+                width: 20px;
+                height: 20px;
             }
         }
     </style>
@@ -553,20 +566,18 @@
         </div>
 
         <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color kjelsas"></div>
+                <span>Kjelsås</span>
+            </div>
             <div class="goal-counter">
                 <span class="score" id="kjelasScore">0</span>
                 <span class="score-separator">-</span>
                 <span class="score" id="oppositionScore">0</span>
             </div>
-            <div class="legend-teams">
-                <div class="legend-item">
-                    <div class="legend-color kjelsas"></div>
-                    <span>Kjelsås</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color opposition"></div>
-                    <span>Motstanderne</span>
-                </div>
+            <div class="legend-item">
+                <div class="legend-color opposition"></div>
+                <span>Motstanderne</span>
             </div>
         </div>
     </div>
