@@ -266,12 +266,33 @@
             border-color: #fff9c4;
         }
 
-        /* Play button */
+        /* Play controls */
         .controls {
             display: flex;
+            flex-direction: row;
             justify-content: center;
-            gap: 15px;
+            align-items: center;
+            gap: 10px;
             margin: 15px 15px 0 15px;
+            flex-wrap: wrap;
+        }
+
+        .side-select {
+            padding: 12px 15px;
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .side-select:focus {
+            outline: none;
+            border-color: #66bb6a;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
         }
 
         .play-button {
@@ -372,8 +393,12 @@
         </div>
 
         <div class="controls">
+            <select class="side-select" id="sideSelect">
+                <option value="left">⬅ Spill til venstre</option>
+                <option value="right">➡ Spill til høyre</option>
+            </select>
             <button class="play-button" id="playButton">
-                ▶ Bygg fra Bakken
+                ▶ Spill
             </button>
         </div>
 
@@ -517,8 +542,9 @@
                 kjelasPlayersToReset.forEach(player => player.classList.remove('animating'));
                 ballElement.classList.remove('animating');
 
-                // Randomly choose left or right side for defender
-                const side = Math.random() > 0.5 ? 'left' : 'right';
+                // Get selected side from dropdown
+                const sideSelect = document.getElementById('sideSelect');
+                const side = sideSelect.value;
                 const defenderX = side === 'left' ? 35 : 65;
                 const defenderY = 88;
 
