@@ -328,12 +328,19 @@
 
         .legend {
             display: flex;
-            justify-content: center;
-            gap: 30px;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
             margin: 20px 15px 15px 15px;
             padding: 15px;
             background: #f5f5f5;
             border-radius: 8px;
+        }
+
+        .legend-teams {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
         }
 
         .legend-item {
@@ -362,6 +369,30 @@
         .legend-color.goalkeeper {
             background: linear-gradient(135deg, #f9a825 0%, #fbc02d 100%);
             border-color: #fff9c4;
+        }
+
+        /* Goal counter */
+        .goal-counter {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .score {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2196f3;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .score-separator {
+            font-size: 24px;
+            font-weight: bold;
+            color: #999;
         }
 
         /* Play controls */
@@ -522,13 +553,20 @@
         </div>
 
         <div class="legend">
-            <div class="legend-item">
-                <div class="legend-color kjelsas"></div>
-                <span>Kjelsås</span>
+            <div class="goal-counter">
+                <span class="score" id="kjelasScore">0</span>
+                <span class="score-separator">-</span>
+                <span class="score" id="oppositionScore">0</span>
             </div>
-            <div class="legend-item">
-                <div class="legend-color opposition"></div>
-                <span>Motstanderne</span>
+            <div class="legend-teams">
+                <div class="legend-item">
+                    <div class="legend-color kjelsas"></div>
+                    <span>Kjelsås</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color opposition"></div>
+                    <span>Motstanderne</span>
+                </div>
             </div>
         </div>
     </div>
@@ -629,22 +667,34 @@
 
             // Check if ball is in goal area (centered and at top or bottom)
             const isInGoalX = ballX > 40 && ballX < 60; // Within goal width
-            const isInTopGoal = ballY < 8; // Top goal
-            const isInBottomGoal = ballY > 92; // Bottom goal
+            const isInTopGoal = ballY < 8; // Top goal (Kjelsas scores)
+            const isInBottomGoal = ballY > 92; // Bottom goal (Opposition scores)
 
-            if (isInGoalX && (isInTopGoal || isInBottomGoal)) {
-                celebrateGoal();
+            if (isInGoalX && isInTopGoal) {
+                celebrateGoal('kjelsas');
+                return true;
+            } else if (isInGoalX && isInBottomGoal) {
+                celebrateGoal('opposition');
                 return true;
             }
             return false;
         }
 
         // Trigger celebration animation
-        function celebrateGoal() {
+        function celebrateGoal(scoringTeam) {
             const stands = document.querySelectorAll('.stand');
             stands.forEach(stand => {
                 stand.classList.add('celebrating');
             });
+
+            // Update score
+            if (scoringTeam === 'kjelsas') {
+                const scoreElement = document.getElementById('kjelasScore');
+                scoreElement.textContent = parseInt(scoreElement.textContent) + 1;
+            } else if (scoringTeam === 'opposition') {
+                const scoreElement = document.getElementById('oppositionScore');
+                scoreElement.textContent = parseInt(scoreElement.textContent) + 1;
+            }
 
             // Remove celebration class after animation
             setTimeout(() => {
