@@ -254,6 +254,52 @@
             border-color: #fff9c4;
         }
 
+        /* Play button */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .play-button {
+            background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .play-button:hover {
+            background: linear-gradient(135deg, #66bb6a 0%, #81c784 100%);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .play-button:active {
+            transform: translateY(0);
+        }
+
+        .play-button:disabled {
+            background: #bdbdbd;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Animation transitions */
+        .player.animating,
+        .ball.animating {
+            transition: left 1s ease-in-out, top 1s ease-in-out;
+        }
+
         @media (max-width: 480px) {
             h1 {
                 font-size: 20px;
@@ -313,6 +359,12 @@
             </div>
         </div>
 
+        <div class="controls">
+            <button class="play-button" id="playButton">
+                ▶ Play from Back
+            </button>
+        </div>
+
         <div class="legend">
             <div class="legend-item">
                 <div class="legend-color kjelsas"></div>
@@ -352,11 +404,19 @@
         const field = document.querySelector('.field');
         let activePlayer = null;
         let offset = { x: 0, y: 0 };
+        let playerElements = [];
+        let ballElement = null;
+        let isAnimating = false;
+
+        // Store original positions for reset
+        const originalPositions = new Map();
 
         // Create players
         function createPlayer(data, team) {
             const player = document.createElement('div');
             player.className = `player ${team}`;
+            player.dataset.number = data.number;
+            player.dataset.team = team;
 
             // Mark goalkeepers (player number 1)
             if (data.number === 1) {
@@ -366,6 +426,9 @@
             player.textContent = data.number;
             player.style.left = `${data.x}%`;
             player.style.top = `${data.y}%`;
+
+            // Store original position
+            originalPositions.set(player, { x: data.x, y: data.y });
 
             // Mouse events for desktop
             player.addEventListener('mousedown', startDrag);
@@ -378,8 +441,14 @@
         }
 
         // Initialize players
-        kjelasPlayers.forEach(data => createPlayer(data, 'kjelsas'));
-        oppositionPlayers.forEach(data => createPlayer(data, 'opposition'));
+        kjelasPlayers.forEach(data => {
+            const player = createPlayer(data, 'kjelsas');
+            playerElements.push(player);
+        });
+        oppositionPlayers.forEach(data => {
+            const player = createPlayer(data, 'opposition');
+            playerElements.push(player);
+        });
 
         // Create the ball
         function createBall() {
@@ -399,7 +468,77 @@
         }
 
         // Initialize ball at center spot
-        createBall();
+        ballElement = createBall();
+
+        // Play from back animation
+        function playFromBack() {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            const playButton = document.getElementById('playButton');
+            playButton.disabled = true;
+
+            // Find Kjelsas players
+            const goalkeeper = playerElements.find(p => p.dataset.team === 'kjelsas' && p.dataset.number === '1');
+            const defender = playerElements.find(p => p.dataset.team === 'kjelsas' && p.dataset.number === '2');
+            const leftMid = playerElements.find(p => p.dataset.team === 'kjelsas' && p.dataset.number === '3');
+            const rightMid = playerElements.find(p => p.dataset.team === 'kjelsas' && p.dataset.number === '4');
+
+            // Randomly choose left or right side for defender
+            const side = Math.random() > 0.5 ? 'left' : 'right';
+            const defenderX = side === 'left' ? 35 : 65;
+            const defenderY = 88;
+
+            // Step 1: Move ball to goalkeeper (300ms)
+            ballElement.classList.add('animating');
+            ballElement.style.left = goalkeeper.style.left;
+            ballElement.style.top = goalkeeper.style.top;
+
+            setTimeout(() => {
+                // Step 2: Defender drops back to receive (1000ms)
+                defender.classList.add('animating');
+                defender.style.left = `${defenderX}%`;
+                defender.style.top = `${defenderY}%`;
+
+                setTimeout(() => {
+                    // Step 3: Ball moves to defender (1000ms)
+                    ballElement.style.left = defender.style.left;
+                    ballElement.style.top = defender.style.top;
+
+                    // Step 4: Midfielders move to support positions (1000ms)
+                    leftMid.classList.add('animating');
+                    rightMid.classList.add('animating');
+
+                    if (side === 'left') {
+                        // Defender is on left, midfielders approach
+                        leftMid.style.left = '25%';
+                        leftMid.style.top = '80%';
+                        rightMid.style.left = '50%';
+                        rightMid.style.top = '75%';
+                    } else {
+                        // Defender is on right, midfielders approach
+                        leftMid.style.left = '50%';
+                        leftMid.style.top = '75%';
+                        rightMid.style.left = '75%';
+                        rightMid.style.top = '80%';
+                    }
+
+                    setTimeout(() => {
+                        // Animation complete - remove animating class
+                        ballElement.classList.remove('animating');
+                        defender.classList.remove('animating');
+                        leftMid.classList.remove('animating');
+                        rightMid.classList.remove('animating');
+
+                        playButton.disabled = false;
+                        isAnimating = false;
+                    }, 1000);
+                }, 1000);
+            }, 300);
+        }
+
+        // Attach play button handler
+        document.getElementById('playButton').addEventListener('click', playFromBack);
 
         function startDrag(e) {
             e.preventDefault();
