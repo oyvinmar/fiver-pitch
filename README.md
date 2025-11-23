@@ -33,6 +33,12 @@ An interactive 5-a-side football pitch application for tactical planning and pla
 - Optimized for both desktop and mobile screens
 - Smooth animations and transitions
 
+### Progressive Web App (PWA)
+- **Installable**: Add to home screen on mobile devices
+- **Offline Support**: Works without internet connection
+- **App-Like Experience**: Runs in standalone mode without browser UI
+- **Custom Icon**: Football pitch themed app icon
+
 ## Tech Stack
 
 - Pure HTML5, CSS3, and vanilla JavaScript
@@ -72,6 +78,25 @@ Or connect your GitHub repository to Vercel for automatic deployments.
 3. **Score Goals**: Drag the ball into the goal areas (top or bottom)
 4. **Run Plays**: Select a direction and click "Spill" to see an animated tactical play
 5. **Track Score**: Watch the live score update as goals are scored
+
+### Installing as an App
+
+**On iOS (iPhone/iPad):**
+1. Open the site in Safari
+2. Tap the Share button
+3. Select "Add to Home Screen"
+4. Tap "Add"
+
+**On Android:**
+1. Open the site in Chrome
+2. Tap the menu (three dots)
+3. Select "Install app" or "Add to Home Screen"
+4. Tap "Install"
+
+**On Desktop (Chrome/Edge):**
+1. Look for the install icon in the address bar
+2. Click "Install"
+3. The app will open in its own window
 
 ## Browser Support
 
