@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fotballbane - 5v5 Taktikk</title>
+    <title>Fiver pitch</title>
     <style>
         * {
             margin: 0;
@@ -13,12 +13,11 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
-            padding: 10px;
+            padding: 5px;
             touch-action: none;
             overflow-y: auto;
         }
@@ -28,7 +27,6 @@
             max-width: 600px;
             background: white;
             border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             padding: 0;
             margin: auto;
         }
@@ -36,7 +34,7 @@
         h1 {
             text-align: center;
             color: #333;
-            margin: 15px 15px 10px 15px;
+            margin: 5px 15px 10px 15px;
             font-size: 24px;
         }
 
@@ -47,10 +45,110 @@
             max-height: calc(100vh - 240px);
             aspect-ratio: 2 / 3;
             margin: 0 auto;
-            background: #4a9d5f;
+            background: #2a2a2a;
             border-radius: 8px;
-            overflow: hidden;
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+            overflow: visible;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Tribuner */
+        .stand {
+            position: absolute;
+            top: 10%;
+            bottom: 10%;
+            width: 40px;
+            background: linear-gradient(to bottom,
+                #1a1a1a 0%,
+                #2a2a2a 10%,
+                #1a1a1a 20%,
+                #2a2a2a 30%,
+                #1a1a1a 40%,
+                #2a2a2a 50%,
+                #1a1a1a 60%,
+                #2a2a2a 70%,
+                #1a1a1a 80%,
+                #2a2a2a 90%,
+                #1a1a1a 100%
+            );
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .stand::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 8px,
+                    rgba(255, 255, 255, 0.03) 8px,
+                    rgba(255, 255, 255, 0.03) 10px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 3px,
+                    rgba(255, 255, 255, 0.02) 3px,
+                    rgba(255, 255, 255, 0.02) 4px
+                );
+        }
+
+        .stand.left {
+            left: -45px;
+            border-radius: 8px 0 0 8px;
+        }
+
+        .stand.right {
+            right: -45px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* Tilskuere (små prikker) */
+        .spectators {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(circle, rgba(255, 200, 150, 0.4) 1px, transparent 1px),
+                radial-gradient(circle, rgba(255, 220, 180, 0.3) 1px, transparent 1px),
+                radial-gradient(circle, rgba(255, 180, 120, 0.4) 1px, transparent 1px);
+            background-size: 8px 8px, 8px 8px, 8px 8px;
+            background-position: 0 0, 4px 4px, 2px 6px;
+            transition: all 0.3s ease;
+        }
+
+        /* Jubel-animasjon */
+        @keyframes celebrate {
+            0%, 100% {
+                transform: translateX(0) scale(1);
+                filter: brightness(1);
+            }
+            25% {
+                transform: translateX(-3px) scale(1.05);
+                filter: brightness(1.5);
+            }
+            75% {
+                transform: translateX(3px) scale(1.05);
+                filter: brightness(1.5);
+            }
+        }
+
+        .stand.celebrating {
+            animation: celebrate 0.4s ease-in-out 3;
+        }
+
+        .stand.celebrating .spectators {
+            background-image:
+                radial-gradient(circle, rgba(255, 215, 0, 0.8) 1.5px, transparent 1.5px),
+                radial-gradient(circle, rgba(255, 140, 0, 0.7) 1.5px, transparent 1.5px),
+                radial-gradient(circle, rgba(255, 69, 0, 0.8) 1.5px, transparent 1.5px);
+            animation: celebrate 0.4s ease-in-out 3;
         }
 
         @supports not (aspect-ratio: 2 / 3) {
@@ -362,9 +460,17 @@
 </head>
 <body>
     <div class="container">
-        <h1>⚽ 5v5 Fotball Taktikk</h1>
-
         <div class="field-container">
+            <!-- Venstre tribune -->
+            <div class="stand left">
+                <div class="spectators"></div>
+            </div>
+
+            <!-- Høyre tribune -->
+            <div class="stand right">
+                <div class="spectators"></div>
+            </div>
+
             <div class="field">
                 <!-- Field markings -->
                 <div class="field-line border-top"></div>
@@ -405,15 +511,11 @@
         <div class="legend">
             <div class="legend-item">
                 <div class="legend-color kjelsas"></div>
-                <span>Kjelsas</span>
+                <span>Kjelsås</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color opposition"></div>
                 <span>Motstanderne</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color goalkeeper"></div>
-                <span>Keepere</span>
             </div>
         </div>
     </div>
@@ -506,6 +608,38 @@
 
         // Initialize ball at center spot
         ballElement = createBall();
+
+        // Check if ball is in goal and trigger celebration
+        function checkGoal() {
+            const ballY = parseFloat(ballElement.style.top);
+            const ballX = parseFloat(ballElement.style.left);
+
+            // Check if ball is in goal area (centered and at top or bottom)
+            const isInGoalX = ballX > 40 && ballX < 60; // Within goal width
+            const isInTopGoal = ballY < 8; // Top goal
+            const isInBottomGoal = ballY > 92; // Bottom goal
+
+            if (isInGoalX && (isInTopGoal || isInBottomGoal)) {
+                celebrateGoal();
+                return true;
+            }
+            return false;
+        }
+
+        // Trigger celebration animation
+        function celebrateGoal() {
+            const stands = document.querySelectorAll('.stand');
+            stands.forEach(stand => {
+                stand.classList.add('celebrating');
+            });
+
+            // Remove celebration class after animation
+            setTimeout(() => {
+                stands.forEach(stand => {
+                    stand.classList.remove('celebrating');
+                });
+            }, 1200); // 3 iterations * 0.4s
+        }
 
         // Play from back animation
         function playFromBack() {
@@ -658,9 +792,16 @@
             let xPercent = (x / rect.width) * 100;
             let yPercent = (y / rect.height) * 100;
 
-            // Constrain to field boundaries (with some padding)
-            xPercent = Math.max(5, Math.min(95, xPercent));
-            yPercent = Math.max(5, Math.min(95, yPercent));
+            // Constrain to field boundaries
+            // Allow ball to enter goal areas (top and bottom)
+            if (activePlayer.classList.contains('ball')) {
+                xPercent = Math.max(5, Math.min(95, xPercent));
+                yPercent = Math.max(1, Math.min(99, yPercent));
+            } else {
+                // Players have tighter constraints
+                xPercent = Math.max(5, Math.min(95, xPercent));
+                yPercent = Math.max(5, Math.min(95, yPercent));
+            }
 
             activePlayer.style.left = `${xPercent}%`;
             activePlayer.style.top = `${yPercent}%`;
@@ -674,6 +815,12 @@
                 document.removeEventListener('mousemove', drag);
                 document.removeEventListener('mouseup', endDrag);
             }
+
+            // Check if ball was dropped in goal
+            if (activePlayer && activePlayer.classList.contains('ball')) {
+                checkGoal();
+            }
+
             activePlayer = null;
         }
 
